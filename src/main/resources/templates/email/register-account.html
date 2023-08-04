@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vn">
+  <head>
+    <title>[JOT] Thông tin tài khoản</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    <p>Kính chào <b th:text="${account.name}"></b>,</p>
+    <p>Chào mừng bạn đến với JOT - Hệ thống tìm kiếm việc làm toàn quốc do đội ngũ JOT phát triển,</p>
+    <p>Tài khoản đăng nhập vào hệ thống JOT của bạn được đăng ký thành công.</p>
+    <p>Dưới đây là thông tin đăng nhập của bạn: (Vui lòng đăng nhập và đổi mật khẩu để đảm bảo thông tin của bạn được giữ an toàn)</p>
+    <p>
+    + Tên đăng nhập: <b th:text="${account.username}"></b><br>
+    + Mật khẩu: <b th:text="${account.password}"></b>
+    </p>
+    <p>
+       ⇨ <a href="http://localhost:5173/login">Link truy cập hệ thống</a>
+    </p>
+    <p>
+      <span>Thanks and Best Regards, </span>
+      <br />
+      <em>JOT Team.</em>
+    </p>
+  </body>
+</html>

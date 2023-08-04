@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vn">
+  <head>
+    <title>[JOT] Mã OTP dùng một lần</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  </head>
+  <body>
+    <p>Kính chào <b th:text="${account.name}"></b>,</p>
+    <p>Dưới đây là thông tin mã OTP dùng một lần của hệ thống JOT cho hành động lấy lại mật khẩu,</p>
+    <p>Vui lòng không chia sẻ mã OTP này với bất kỳ ai.</p>
+    <p>Mã OTP của bạn là: <b th:text="${account.otp}"></b></p>
+    <p>Lưu ý: mã OTP chỉ có thời hạn trong 3 phút.</p>
+    <p>
+      <span>Thanks and Best Regards, </span>
+      <br />
+      <em>JOT Team.</em>
+    </p>
+  </body>
+</html>
