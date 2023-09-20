@@ -41,6 +41,17 @@ public class Account extends BaseEntity {
 	@Column(name = "email", columnDefinition = "VARCHAR(50)", nullable = false)
 	private String email;
 
+	@Column(name = "is_del", columnDefinition = "BIT DEFAULT 0", nullable = false)
+	private boolean isDel;
+
+	public boolean isDel() {
+		return isDel;
+	}
+
+	public void setDel(boolean del) {
+		isDel = del;
+	}
+
 	public Long getId() {
 		return id;
 	}

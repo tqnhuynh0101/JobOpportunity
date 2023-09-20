@@ -43,6 +43,14 @@ public class Constants {
 	public static final String YYYY_MM_DD = "yyyyMMdd";
 	
 	public static final String HH_MM_SS = "HHmmss";
+
+	public static final String DD_MM_YYYY = "dd-MM-yyyy";
+
+	public static final String DD_MM_YYYY_HH_mm_ss = "dd-MM-yyyy HH:mm:ss";
+
+	public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
+	public static final String ACCOUNT_NOT_AUTHORITY = "Bạn không có quyền truy cập trang này!";
 	
 	public static final String REGISTER_SUCCESS = "Đăng ký tài khoản thành công\nVui lòng kiểm tra email để nhận thông tin đăng nhập!";
 
@@ -64,9 +72,13 @@ public class Constants {
 	
 	public static final String GUEST = "guest";
 
+	public static final String POSTS = "posts";
+
 	public static final String SUBJECT_CREATE_ACCOUNT = "[JOT] Thông báo tạo tài khoản thành công";
 
 	public static final String SUCCESS_OTP_ACCOUNT = "[JOT] Thông báo xác thực otp thành công";
+
+	public static final String SUCCESS_AUTO_SEARCH = "[JOT] Thông báo tự động tìm việc thành công";
 
 	public static final String ACCOUNT_NOT_FOUND = "Tài khoản không tồn tại!";
 
@@ -88,5 +100,7 @@ public class Constants {
 
 	public static final String UNPAID = "Người dùng này chưa thanh toán!";
 
+	public static final String PAID_SUCCESS = "Thanh toán thành công";
 
+	public static final String PAID_ERROR = "Thanh toán thất bại";
 }

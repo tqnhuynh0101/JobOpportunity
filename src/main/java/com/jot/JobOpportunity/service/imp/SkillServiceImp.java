@@ -134,7 +134,7 @@ public class SkillServiceImp implements SkillService {
 	}
 
 	@Override
-	public void saveSkill(String skillList) {
+	public Long saveSkill(String skillList) {
 		try{
 			skillList = skillList.toUpperCase(Locale.ROOT);
 			Skill skill = skillRepository.getSkillBySkillName(skillList);
@@ -145,7 +145,10 @@ public class SkillServiceImp implements SkillService {
 				s = Utils.setCreate(s);
 				skillRepository.save(s);
 			}
-		}catch (Exception e){}
+			return skillRepository.getSkillBySkillName(skillList).getId();
+		}catch (Exception e){
+			return null;
+		}
 	}
 
 }

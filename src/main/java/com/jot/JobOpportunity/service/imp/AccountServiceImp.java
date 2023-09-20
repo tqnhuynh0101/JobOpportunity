@@ -24,6 +24,8 @@ import com.jot.JobOpportunity.service.ApprovedPostService;
 import com.jot.JobOpportunity.service.MailService;
 import com.jot.JobOpportunity.service.OtpService;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class AccountServiceImp implements AccountService {
@@ -57,6 +59,7 @@ public class AccountServiceImp implements AccountService {
 	public Account getAccountById(Long id) {
 		return accountRepository.getAccountById(id);
 	}
+
 
 	@Transactional
 	@Override
@@ -241,4 +244,50 @@ public class AccountServiceImp implements AccountService {
 		return res;
 	}
 
+	@Override
+	public DataResponse getAccountManagement() {
+		log.debug("Request get account management");
+		DataResponse res = new DataResponse();
+		try {
+			Account account = this.getAccountLogin();
+			if(!account.getAuthority().equals(Constants.ROLE_ADMIN)) {
+				res.setStatus(Constants.ERROR);
+				res.setMessage(Constants.ACCOUNT_NOT_AUTHORITY);
+				return res;
+			}
+			List<Account> listDb = accountRepository.getAccountManagement();
+			if (listDb == null) {
+				res.setStatus(Constants.NOT_FOUND);
+				res.setMessage(Constants.DATA_EMPTY);
+				return res;
+			} else {
+				List<AccountManagementDto> list = Utils.mapList(listDb, AccountManagementDto.class);
+				res.setStatus(Constants.SUCCESS);
+				res.setResult(list);
+				return res;
+			}
+		} catch (Exception e) {
+			res.setStatus(Constants.ERROR);
+			res.setMessage(Constants.DATA_ERROR);
+			return res;
+		}
+	}
+
+	@Override
+	public DataResponse deleteAccountById(String id) {
+		log.debug("AccountServiceImp.deleteAccountById()");
+		DataResponse res = new DataResponse();
+		try {
+			Long accountId = Long.parseLong(id);
+			accountRepository.deleteAccountById(accountId);
+			res.setStatus(Constants.SUCCESS);
+			res.setMessage(Constants.DELETE_SUCCESS);
+			return res;
+		} catch (Exception e) {
+			log.debug("Error deleteAccountById in AccountServiceImp");
+			res.setStatus(Constants.ERROR);
+			res.setMessage(Constants.DATA_ERROR);
+			return res;
+		}
+	}
 }

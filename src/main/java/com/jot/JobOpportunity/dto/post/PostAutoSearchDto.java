@@ -1,19 +1,25 @@
 package com.jot.JobOpportunity.dto.post;
 
+import com.jot.JobOpportunity.common.Utils;
 import com.jot.JobOpportunity.entity.SkillPost;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
 public class PostAutoSearchDto {
     private Long id;
+    private String title;
     private Integer ageMax;
     private Integer ageMin;
     private Integer gender;
     private String position;
+    private String content;
     private BigDecimal salaryMin;
     private BigDecimal salaryMax;
+    private String unit;
     private String provinceId;
+    private String image;
     private List<SkillPost> skills;
 
     public Long getId() {
@@ -86,5 +92,41 @@ public class PostAutoSearchDto {
 
     public void setSkills(List<SkillPost> skills) {
         this.skills = skills;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        try {
+            this.image = Utils.convertToBase64(image);
+        } catch (IOException e) {
+            this.image = image;
+        }
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

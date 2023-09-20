@@ -23,5 +23,8 @@ public interface AccountService {
 	DataResponse getAccountForgotPass(String userName);
 	
 	DataResponse accountUpdateInformation(AccountUpdateInforDto accountUpdateInforDtos);
-	
+
+	DataResponse getAccountManagement();
+
+	DataResponse deleteAccountById(String id);
 }

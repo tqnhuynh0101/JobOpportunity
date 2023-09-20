@@ -26,7 +26,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             + " benafit as benafit, duty as duty, salary as salary, salary_Min as salaryMin,"
             + " salary_Max as salaryMax, unit as unit, company as company, tel as tel, email as email,"
             + " expired_Date as expiredDate, flag as flag, poster_Id as posterId, address as address," +
-            " ward_id as wardId, district_id as districtId, province_id as provinceId, image as image FROM POST WHERE is_del = 0 AND flag = 1", nativeQuery = true)
+            " ward_id as wardId, district_id as districtId, province_id as provinceId, image as image FROM POST WHERE is_del = 0 AND flag = 1" +
+            " ORDER BY id DESC", nativeQuery = true)
     public Page<PostItfDto> getAllPost(Pageable pageable);
 
     @Query(value = "SELECT id as id, title as title, content as content, quantity as quantity,"
@@ -40,9 +41,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     public List<PostItfDto> getNewestPosts();
 
     @Query(value = "SELECT p.id as id, p.age_Max as ageMax, p.age_Min as ageMin, p.gender as gender,\n" +
-            "p.position as position, p.salary_Min as salaryMin, p.salary_Max as salaryMax, p.province_id as provinceId\n" +
-            "FROM POST p, EFFECT e WHERE is_del = 0 AND flag = 1 AND p.id != e.post_id", nativeQuery = true)
-    public List<PostAutoSearchItfDto> getPostForAutoSearch();
+            "                        p.position as position, p.salary_Min as salaryMin, p.salary_Max as salaryMax, p.province_id as provinceId,\n" +
+            "                        p.title as title, p.image as image, p.content as content, p.unit as unit\n" +
+            "                        FROM POST p\n" +
+            "                        WHERE p.is_del = 0 AND p.flag = 1 AND p.expired_date > :expired_date and\n" +
+            "                        p.id not in (select p.id from post p inner join effect e on p.id = e.post_id where account_id = :accountId)\n" +
+            "                        order by create_time DESC", nativeQuery = true)
+    public List<PostAutoSearchItfDto> getPostForAutoSearch(@Param("accountId") Long accountId, @Param("expired_date") String expired_date);
 
     @Query(value = "SELECT distinct p.id as id, p.title as title, p.content as content, p.quantity as quantity,\n" +
             "            p.age_Max as ageMax, p.age_Min as ageMin, p.gender as gender, p.experience as experience,\n" +
@@ -69,12 +74,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "p.expired_Date as expiredDate, p.flag as flag, p.poster_Id as posterId, p.address as address," +
             "p.ward_id as wardId, p.district_id as districtId, p.province_id as provinceId, p.image as image " +
             "FROM POST p " +
-            "INNER JOIN skill_post s " +
+            "LEFT JOIN skill_post s " +
             "ON p.id = s.post_id "+
             "WHERE (p.ward_Id = :wardId or p.district_id = :districtId or p.province_id = :provinceId) " +
-            "AND (p.position like :position or s.skill like :skill or p.content like :content)", nativeQuery = true)
+            "AND (p.position like :position or s.skill like :skill or p.content like :content or p.company like :company)", nativeQuery = true)
     public List<PostItfDto> searchPost(@Param("wardId") String wardId, @Param("districtId") String districtId
-            ,@Param("provinceId") String provinceId, @Param("position") String position, @Param("skill") String skill, @Param("content") String content);
+            ,@Param("provinceId") String provinceId, @Param("position") String position, @Param("skill") String skill, @Param("content") String content,@Param("company") String company);
 
     @Query(value = "SELECT distinct p.id as id, p.title as title, p.content as content, p.quantity as quantity," +
             "p.age_Max as ageMax, p.age_Min as ageMin, p.gender as gender, p.experience as experience," +
@@ -84,11 +89,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "p.expired_Date as expiredDate, p.flag as flag, p.poster_Id as posterId, p.address as address," +
             "p.ward_id as wardId, p.district_id as districtId, p.province_id as provinceId, p.image as image " +
             "FROM POST p " +
-            "INNER JOIN skill_post s " +
+            "LEFT JOIN skill_post s " +
             "ON p.id = s.post_id "+
             "WHERE" +
-            "(p.position like :position or s.skill like :skill or p.content like :content)", nativeQuery = true)
-    public List<PostItfDto> searchByText(@Param("position") String position, @Param("skill") String skill, @Param("content") String content);
+            "(p.position like :position or s.skill like :skill or p.content like :content or p.company like :company)", nativeQuery = true)
+    public List<PostItfDto> searchByText(@Param("position") String position, @Param("skill") String skill, @Param("content") String content, @Param("company") String company);
 
     @Query(value = "SELECT id as id, title as title, content as content, quantity as quantity,"
             + " age_Max as ageMax, age_Min as ageMin, gender as gender, experience as experience,"
@@ -98,7 +103,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             + " expired_Date as expiredDate, flag as flag," +
             " poster_Id as posterId, address as address, ward_id as wardId, district_id as districtId, " +
             "province_id as provinceId, image as image, is_Del as isDel, create_by as createBy, create_time as createTime" +
-            " FROM POST", nativeQuery = true)
+            " FROM POST ORDER BY create_time DESC", nativeQuery = true)
     public Page<PostAdminItfDto> adminPost(Pageable pageable);
 
     @Query(value = "SELECT id as id, title as title, content as content, quantity as quantity,"
@@ -109,7 +114,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             + " expired_Date as expiredDate, flag as flag," +
             " poster_Id as posterId, address as address, ward_id as wardId, district_id as districtId, " +
             "province_id as provinceId, image as image, is_Del as isDel, create_by as createBy, create_time as createTime" +
-            " FROM POST WHERE poster_id = :posterId", nativeQuery = true)
+            " FROM POST WHERE poster_id = :posterId ORDER BY create_time DESC", nativeQuery = true)
     public Page<PostAdminItfDto> seekerPost(Pageable pageable, @Param("posterId") Long posterId);
 
     @Modifying

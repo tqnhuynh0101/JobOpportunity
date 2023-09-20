@@ -1,5 +1,6 @@
 package com.jot.JobOpportunity.dto.post;
 
+import com.jot.JobOpportunity.common.Utils;
 import com.jot.JobOpportunity.entity.SkillPost;
 
 import java.math.BigDecimal;
@@ -213,7 +214,7 @@ public class PostAdminDto {
     }
 
     public void setExpiredDate(String expiredDate) {
-        this.expiredDate = expiredDate;
+        this.expiredDate = Utils.getStringDateDisplay(Utils.getDate(expiredDate));
     }
 
     public boolean isFlag() {
@@ -277,7 +278,7 @@ public class PostAdminDto {
     }
 
     public void setCreateTime(String createTime) {
-        this.createTime = createTime;
+        this.createTime = Utils.getStringDateTimeDisplay(Utils.getDateTime(createTime));
     }
 
 

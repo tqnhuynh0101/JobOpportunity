@@ -78,6 +78,12 @@ public class PostServceImp implements PostService {
     @Autowired
     private ApplyPostService applyPostService;
 
+    @Autowired
+    private MailService mailService;
+
+    @Autowired
+    private EffectService effectService;
+
     @Override
     @Transactional
     public DataResponse getAllPost(Pageable pageable) {
@@ -106,7 +112,6 @@ public class PostServceImp implements PostService {
     @Override
     public DataResponse searchPost(String wardId, String districtId, String provinceId, String search) {
         log.debug("PostServceImp.searchPost()");
-
         DataResponse res = new DataResponse();
         try {
             if (search == null){
@@ -114,7 +119,7 @@ public class PostServceImp implements PostService {
             }
             String content = "%" + search + "%";
             if (provinceId == null) {
-                List<PostItfDto> postItfDtoList = postRepository.searchByText(search, search, content);
+                List<PostItfDto> postItfDtoList = postRepository.searchByText(search, search, content, search);
                 List<PostDetailDto> base = Utils.mapList(postItfDtoList, PostDetailDto.class);
                 if (base.size() != 0) {
                     for (PostDetailDto post : base) {
@@ -136,7 +141,7 @@ public class PostServceImp implements PostService {
                 districtId = null;
             }
 
-            List<PostItfDto> postItfDtoList = postRepository.searchPost(wardId, districtId, provinceId, search, search, content);
+            List<PostItfDto> postItfDtoList = postRepository.searchPost(wardId, districtId, provinceId, search, search, content, search);
             List<PostDetailDto> base = Utils.mapList(postItfDtoList, PostDetailDto.class);
             if (base.size() != 0) {
                 for (PostDetailDto post : base) {
@@ -502,7 +507,6 @@ public class PostServceImp implements PostService {
         try {
             PostCreateDto postCreateDto = Utils.convertStringToObject(str, PostCreateDto.class);
             post = mapper.map(postCreateDto, Post.class);
-            post.setExpiredDate(Utils.currentDate());
             post = Utils.setCreate(post);
             post.setFlag(false);
             post.setDel(false);
@@ -559,16 +563,16 @@ public class PostServceImp implements PostService {
 
     @Override
     @Transactional
-    public DataResponse searchByAutoSearch(AutoSearchRunDto autoSearchRunDto){
+    public void searchByAutoSearch(AutoSearchRunDto autoSearchRunDto){
         log.debug("PostServceImp.searchByAutoSearch()");
         DataResponse res = new DataResponse();
         try{
-            List<PostAutoSearchItfDto> postItf = postRepository.getPostForAutoSearch();
+            String date = Utils.currentDate();
+            List<PostAutoSearchItfDto> postItf = postRepository.getPostForAutoSearch(autoSearchRunDto.getAccountId(), date);
             List<PostAutoSearchDto> post = Utils.mapList(postItf, PostAutoSearchDto.class);
             List<PostAutoSearchDto> result = new ArrayList<>();
             if(postItf.size() == 0){
-                res.setStatus(Constants.NOT_FOUND);
-                return res;
+                return;
             }
             for(PostAutoSearchDto p: post){
                 p.setSkills(skillPostRepository.getByPostId(p.getId()));
@@ -600,85 +604,70 @@ public class PostServceImp implements PostService {
                     result.add(p);
                 }
             }
-            res.setStatus(Constants.SUCCESS);
-            res.setResult(result);
-            return res;
+            if(result.size() != 0){
+                List<Effect> effects = new ArrayList<>();
+                for(PostAutoSearchDto p : result){
+                    Effect e = new Effect();
+                    e.setId(null);
+                    e.setAccountId(autoSearchRunDto.getAccountId());
+                    e.setPostId(p.getId());
+                    effects.add(e);
+                }
+                effectService.save(effects);
+                mailService.sendMailAutoSearch(result, autoSearchRunDto);
+            }
+            return;
         }catch (Exception e){
-            res.setStatus(Constants.ERROR);
-            return res;
+            return;
         }
     }
-
-//    @Override
-//    @Transactional
-//    public DataResponse approvedPost(String id){
-//        DataResponse res = new DataResponse();
-//        try{
-//            Long postId = Long.parseLong(id);
-//            Post p = postRepository.getPostById(postId);
-//            if(p == null){
-//                res.setStatus(Constants.ERROR);
-//                res.setMessage(Constants.UPDATE_FAIL);
-//            }
-//            ApprovedPost approvedPost = approvedPostService.getByPosterId(p.getPosterId());
-//            if(approvedPost == null){
-//                res.setStatus(Constants.ERROR);
-//                res.setMessage(Constants.UNPAID);
-//            }
-//            if(approvedPost.isFree() == true){
-//                p.setFlag(false);
-//                approvedPost.setFree(false);
-//                postRepository.save(p);
-//                approvedPostService.save(approvedPost);
-//                res.setStatus(Constants.SUCCESS);
-//                res.setMessage(Constants.SAVE_SUCCESS);
-//                return res;
-//            }
-//            if(approvedPost.getQuantity() > 0){
-//                p.setFlag(false);
-//                approvedPost.setQuantity(approvedPost.getQuantity() - 1);
-//                postRepository.save(p);
-//                approvedPostService.save(approvedPost);
-//                res.setStatus(Constants.SUCCESS);
-//                res.setMessage(Constants.SAVE_SUCCESS);
-//                return res;
-//            }
-//            Date current = Utils.getCurrentDateTime();
-//            Date expiredDate= Utils.getDateTime(approvedPost.getExpiredDate());
-//            if(((current.getTime() - expiredDate.getTime()) >= 0))
-//            {
-//                p.setFlag(false);
-//                postRepository.save(p);
-//                res.setStatus(Constants.SUCCESS);
-//                res.setMessage(Constants.SAVE_SUCCESS);
-//                return res;
-//            }
-//            res.setStatus(Constants.ERROR);
-//            res.setMessage(Constants.UNPAID);
-//            return res;
-//        }catch (Exception e){
-//            res.setStatus(Constants.ERROR);
-//            res.setMessage(Constants.UPDATE_FAIL);
-//            return res;
-//        }
-//    }
 
     @Override
     @Transactional
     public DataResponse approvedPost(String id){
-        log.debug("PostServceImp.approvedPost()");
         DataResponse res = new DataResponse();
-        try {
+        try{
             Long postId = Long.parseLong(id);
             Post p = postRepository.getPostById(postId);
-            if (p == null) {
+            if(p == null){
                 res.setStatus(Constants.ERROR);
                 res.setMessage(Constants.UPDATE_FAIL);
             }
-            p.setFlag(false);
-            postRepository.save(p);
-            res.setStatus(Constants.SUCCESS);
-            res.setMessage(Constants.SAVE_SUCCESS);
+            ApprovedPost approvedPost = approvedPostService.getByPosterId(p.getPosterId());
+            if(approvedPost == null){
+                res.setStatus(Constants.ERROR);
+                res.setMessage(Constants.UNPAID);
+            }
+            if(approvedPost.isFree() == true){
+                p.setFlag(true);
+                approvedPost.setFree(false);
+                postRepository.save(p);
+                approvedPostService.save(approvedPost);
+                res.setStatus(Constants.SUCCESS);
+                res.setMessage(Constants.SAVE_SUCCESS);
+                return res;
+            }
+            if(approvedPost.getQuantity() > 0){
+                p.setFlag(true);
+                approvedPost.setQuantity(approvedPost.getQuantity() - 1);
+                postRepository.save(p);
+                approvedPostService.save(approvedPost);
+                res.setStatus(Constants.SUCCESS);
+                res.setMessage(Constants.SAVE_SUCCESS);
+                return res;
+            }
+            Date current = Utils.getCurrentDateTime();
+            Date expiredDate= Utils.getDateTime(approvedPost.getExpiredDate());
+            if(((current.getTime() - expiredDate.getTime()) >= 0))
+            {
+                p.setFlag(false);
+                postRepository.save(p);
+                res.setStatus(Constants.SUCCESS);
+                res.setMessage(Constants.SAVE_SUCCESS);
+                return res;
+            }
+            res.setStatus(Constants.ERROR);
+            res.setMessage(Constants.UNPAID);
             return res;
         }catch (Exception e){
             res.setStatus(Constants.ERROR);
@@ -686,6 +675,30 @@ public class PostServceImp implements PostService {
             return res;
         }
     }
+
+//    @Override
+//    @Transactional
+//    public DataResponse approvedPost(String id){
+//        log.debug("PostServceImp.approvedPost()");
+//        DataResponse res = new DataResponse();
+//        try {
+//            Long postId = Long.parseLong(id);
+//            Post p = postRepository.getPostById(postId);
+//            if (p == null) {
+//                res.setStatus(Constants.ERROR);
+//                res.setMessage(Constants.UPDATE_FAIL);
+//            }
+//            p.setFlag(true);
+//            postRepository.save(p);
+//            res.setStatus(Constants.SUCCESS);
+//            res.setMessage(Constants.SAVE_SUCCESS);
+//            return res;
+//        }catch (Exception e){
+//            res.setStatus(Constants.ERROR);
+//            res.setMessage(Constants.UPDATE_FAIL);
+//            return res;
+//        }
+//    }
 
     @Override
     public String checkExpiredDate(Long postId){

@@ -224,7 +224,10 @@ public class PostDetailDto {
 	}
 
 	public void setExpiredDate(String expiredDate) {
-		this.expiredDate = expiredDate;
+		if(Utils.compareDate(expiredDate) == -1) {
+			this.setCheckButton("Bài viết này đã hết hạn");
+		}
+		this.expiredDate = Utils.getStringDateDisplay(Utils.getDate(expiredDate));
 	}
 
 	public boolean isFlag() {

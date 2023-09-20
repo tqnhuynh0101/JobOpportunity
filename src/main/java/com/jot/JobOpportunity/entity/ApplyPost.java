@@ -38,7 +38,18 @@ public class ApplyPost extends BaseEntity{
     @Column(name = "message", columnDefinition = "VARCHAR(500)")
     private String message;
 
+    @Column(name = "cv_id", columnDefinition = "BIGINT", nullable = false)
+    private Long cvId;
+
     public ApplyPost() {
+    }
+
+    public Long getCvId() {
+        return cvId;
+    }
+
+    public void setCvId(Long cvId) {
+        this.cvId = cvId;
     }
 
     public Long getId() {

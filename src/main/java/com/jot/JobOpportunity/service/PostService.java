@@ -14,7 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
  **/
 public interface PostService {
 
-	public DataResponse getAllPost(Pageable pageable);
+	public DataResponse deletePostById(String id);
+
+	public DataResponse approvedPost(String id);
+
+	public DataResponse create(String str, MultipartFile file);
+
+	public void searchByAutoSearch(AutoSearchRunDto autoSearchRunDto);
 
 	public DataResponse searchPost(String wardId, String districtId, String provinceId, String search);
 
@@ -26,21 +32,15 @@ public interface PostService {
 
 	public DataResponse updatePost(String str, MultipartFile file);
 
-	public DataResponse deletePostById(String id);
-
 	public DataResponse adminUpdatePost(String id, String flag, String isDel, String expiredDate);
 
 	public DataResponse adminPost(Pageable pageable);
 
 	public DataResponse getById(String id);
 
-	public DataResponse create(String str, MultipartFile file);
-
 	public String saveFile(MultipartFile file, String path);
 
-	public DataResponse searchByAutoSearch(AutoSearchRunDto autoSearchRunDto);
-
-	public DataResponse approvedPost(String id);
+	public DataResponse getAllPost(Pageable pageable);
 
 	public String checkExpiredDate(Long postId);
 }

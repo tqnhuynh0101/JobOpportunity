@@ -27,6 +27,28 @@ public class Payment extends BaseEntity{
     @Column(name = "content", columnDefinition = "VARCHAR(500)")
     private String content;
 
+    @Column(name ="month", columnDefinition = "VARCHAR(45)", nullable = false)
+    private String month;
+
+    @Column(name ="year", columnDefinition = "VARCHAR(45)", nullable = false)
+    private String year;
+
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
     public Long getId() {
         return id;
     }

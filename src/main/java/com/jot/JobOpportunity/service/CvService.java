@@ -11,8 +11,10 @@ public interface CvService {
 
     public DataResponse getCvByCurrentUser();
     
-    public DataResponse save(String cv, MultipartFile file);
+    public DataResponse update(String cv, MultipartFile file);
 
-	public DataResponse getCvByUuid(String uuid);
+    public DataResponse create(String cv, MultipartFile file);
+
+    public DataResponse getCvByUuid(String uuid);
 
 }

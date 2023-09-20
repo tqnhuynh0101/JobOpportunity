@@ -21,7 +21,7 @@ public class Cv extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@Column(name="employee_id", columnDefinition = "BIGINT", nullable = false, unique = true)
+	@Column(name="employee_id", columnDefinition = "BIGINT", nullable = false)
 	private Long employeeId;
 	
 	@Column(name="intro", columnDefinition = "VARCHAR(500)", nullable = false)
@@ -50,6 +50,17 @@ public class Cv extends BaseEntity {
 	
 	@Column(name="avatar", columnDefinition = "VARCHAR(200)", nullable = true)
 	private String avatar;
+
+	@Column(name ="uuid", columnDefinition = "VARCHAR(200)")
+	private String uuid;
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
 
 	public long getId() {
 		return id;

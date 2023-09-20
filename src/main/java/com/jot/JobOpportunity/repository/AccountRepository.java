@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import com.jot.JobOpportunity.entity.Account;
 
+import java.util.List;
+
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long>{
 
@@ -28,4 +30,13 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 			+ "a.gender = :gender "
 			+ "WHERE a.id = :id")
 	void updateInformation(@Param("age") int age, @Param("tel") String tel, @Param("email") String email, @Param("gender") Boolean gender, @Param("id") Long id);
+
+	@Query(value = "SELECT a FROM Account a WHERE a.authority <> 'ROLE_ADMIN' AND a.isDel = 0")
+	List<Account> getAccountManagement();
+
+	@Modifying
+	@Query(value = "UPDATE Account a SET "
+			+ "a.isDel = true "
+			+ "WHERE a.id = :id")
+	void deleteAccountById(@Param("id") Long id);
 }

@@ -25,19 +25,28 @@ public class CvController {
         return res;
     }
 
-    @PostMapping("/save")
-    public DataResponse saveCv(MultipartHttpServletRequest data){
+    @PostMapping("/create")
+    public DataResponse createCv(MultipartHttpServletRequest data){
         log.debug("CvController.createCv()");
         MultipartFile file = data.getFile("file");
         String strCv = data.getParameter("cv");
-        DataResponse res = cvService.save(strCv, file);
+        DataResponse res = cvService.create(strCv, file);
+        return res;
+    }
+
+    @PostMapping("/update")
+    public DataResponse updateCv(MultipartHttpServletRequest data){
+        log.debug("CvController.update()");
+        MultipartFile file = data.getFile("file");
+        String strCv = data.getParameter("cv");
+        DataResponse res = cvService.update(strCv, file);
         return res;
     }
 
     @GetMapping("/get-cv-view/{uuid}")
     public DataResponse getByUUid(@PathVariable("uuid") String uuid){
-        DataResponse res = new DataResponse();
-        res = cvService.getCvByUuid(uuid);
+        log.debug("CvController.getByUUid()");
+        DataResponse res = cvService.getCvByUuid(uuid);
         return res;
     }
 }

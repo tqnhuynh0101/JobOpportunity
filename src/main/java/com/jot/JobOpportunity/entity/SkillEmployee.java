@@ -23,6 +23,17 @@ public class SkillEmployee extends BaseEntity {
 	@Column(name = "skill", columnDefinition = "VARCHAR(100)", nullable = false)
 	private String skill;
 
+	@Column(name = "skill_id", columnDefinition = "BIGINT", nullable = false)
+	private Long skillId;
+
+	public Long getSkillId() {
+		return skillId;
+	}
+
+	public void setSkillId(Long skillId) {
+		this.skillId = skillId;
+	}
+
 	public Long getId() {
 		return id;
 	}

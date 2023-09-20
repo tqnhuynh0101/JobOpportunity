@@ -34,12 +34,6 @@ public class SkillEmployeeServiceImp implements SkillEmployeeService {
 	private SkillEmployeeRepository skillEmployeeRepository;
 
 	@Autowired
-	private SkillRepository skillRepository;
-
-	@Autowired
-	private ModelMapper mapper;
-
-	@Autowired
 	private AccountService accountService;
 
 	@Autowired
@@ -131,15 +125,16 @@ public class SkillEmployeeServiceImp implements SkillEmployeeService {
 			Long employeeId = accountService.getAccountLogin().getId();
 			skillEmployeeRepository.deleteByEmployeeId(employeeId);
 			for(String skillUpdates : listSkill){
-				skillService.saveSkill(skillUpdates);
+				Long skillId = skillService.saveSkill(skillUpdates);
 				SkillEmployee skillEmployee = new SkillEmployee();
 				skillEmployee.setEmployeeId(employeeId);
 				skillEmployee.setSkill(skillUpdates);
+				skillEmployee.setSkillId(skillId);
 				skillEmployee = Utils.setCreate(skillEmployee);
 				skillEmployeeRepository.save(skillEmployee);
-				res.setStatus(Constants.SUCCESS);
-				res.setMessage(Constants.SAVE_SUCCESS);
 			}
+			res.setStatus(Constants.SUCCESS);
+			res.setMessage(Constants.SAVE_SUCCESS);
 			return res;
 		}catch (Exception e){
 			res.setStatus(Constants.ERROR);

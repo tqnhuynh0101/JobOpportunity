@@ -36,7 +36,16 @@ public class PostCreateDto {
 	private String wardId;
 	private String districtId;
 	private String provinceId;
+	private String expiredDate;
 	private List<String> skillPostList;
+
+	public String getExpiredDate() {
+		return expiredDate;
+	}
+
+	public void setExpiredDate(String expiredDate) {
+		this.expiredDate = expiredDate;
+	}
 
 	public String getTitle() {
 		return title;

@@ -13,7 +13,16 @@ public class AutoSearchRunDto {
     private String provinceCode;
     private BigDecimal salary;
     private String pos;
+    private String email;
     private List<SkillEmployee> skills;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public Long getAccountId() {
         return accountId;
@@ -35,8 +44,11 @@ public class AutoSearchRunDto {
         return gender;
     }
 
-    public void setGender(Integer gender) {
-        this.gender = gender;
+    public void setGender(boolean gender) {
+        if(gender == true)
+            this.gender = 1;
+        else
+            this.gender = 0;
     }
 
     public String getProvinceCode() {

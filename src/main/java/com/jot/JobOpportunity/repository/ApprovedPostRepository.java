@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ApprovedPostRepository extends JpaRepository<ApprovedPost, Long> {
 
-    @Query(value = "SELECT a FROM ApplyPost a WHERE a.posterId = :posterId")
+    @Query(value = "SELECT a FROM ApprovedPost a WHERE a.posterId = :posterId")
     ApprovedPost getByIdPosterId(@Param("posterId") Long posterId);
 }

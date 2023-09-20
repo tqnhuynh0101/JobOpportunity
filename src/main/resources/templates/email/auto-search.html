@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>[JOT] Thông tin việc làm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .job-post {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        .job-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .job-content {
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .job-info {
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .job-link {
+            color: rgb(0, 128, 192);
+            text-decoration: none;
+        }
+
+        .footer {
+            color: #777;
+            margin-top: 20px;
+        }
+
+        .clamp {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>[JOT] Thông tin việc làm</h1>
+    <p>Đã tìm thấy công việc phù hợp với bạn,</p>
+    <p>Dưới đây là thông tin các bài đăng tuyển.</p>
+    <div th:each="post : ${posts}" class="job-post">
+        <div class="job-title" th:text="${post.title}"></div>
+        <div class="job-info">
+            <div class="job-position" th:text="${'Vị trí: ' + post.position}"></div><br>
+            <div class="job-salary" th:inline="text">Mức lương: [[${#numbers.formatDecimal(post.salaryMin, 0, 'COMMA', -1, 'POINT')}]][[${post.unit}]] - [[${#numbers.formatDecimal(post.salaryMax, 0, 'COMMA', -1, 'POINT')}]][[${post.unit}]]</div><br>
+            <div class="job-content clamp" th:text="${post.content}"></div>
+            ⇨ <a class="job-link" th:href="'http://localhost:81/jot/user/post-detail/'+${post.id}">Link truy bài viết</a>
+        </div>
+    </div>
+    <p class="footer">
+        <span>Thanks and Best Regards, </span><br>
+        <em>JOT Team.</em>
+    </p>
+</div>
+</body>
+</html>

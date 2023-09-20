@@ -1,10 +1,14 @@
 package com.jot.JobOpportunity.service.imp;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import com.jot.JobOpportunity.dto.applypost.ApplyPostManagementDto;
+import com.jot.JobOpportunity.dto.applypost.ApplyPostManagementItfDto;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +22,6 @@ import com.jot.JobOpportunity.dto.applypost.MyApplyPostItfDto;
 import com.jot.JobOpportunity.entity.Account;
 import com.jot.JobOpportunity.entity.ApplyPost;
 import com.jot.JobOpportunity.entity.Cv;
-import com.jot.JobOpportunity.entity.CvSend;
 import com.jot.JobOpportunity.entity.Post;
 import com.jot.JobOpportunity.entity.response.DataResponse;
 import com.jot.JobOpportunity.repository.ApplyPostRepository;
@@ -26,7 +29,6 @@ import com.jot.JobOpportunity.repository.CvRepository;
 import com.jot.JobOpportunity.repository.PostRepository;
 import com.jot.JobOpportunity.service.AccountService;
 import com.jot.JobOpportunity.service.ApplyPostService;
-import com.jot.JobOpportunity.service.CvSendService;
 
 @Service
 @Transactional
@@ -44,9 +46,7 @@ public class ApplyPostServiceImp implements ApplyPostService {
 
     @Autowired
     private CvRepository cvRepository;
-    
-    @Autowired
-    private CvSendService cvSendService;
+
 
     @Autowired
     private ApplyPostRepository applyPostRepository;
@@ -58,7 +58,7 @@ public class ApplyPostServiceImp implements ApplyPostService {
             Long postId = Long.parseLong(id);
             Post post = postRepository.getPostById(postId);
             Account account = accountService.getAccountLogin();
-            ApplyPost applyPostTest = applyPostRepository.getApplyPostByAccountIdAndPosterId(account.getId(), post.getPosterId());
+            ApplyPost applyPostTest = applyPostRepository.getApplyPostByAccountIdAndPostId(account.getId(), post.getId());
             if(applyPostTest != null){
                 res.setStatus(Constants.ERROR);
                 res.setMessage(Constants.APPLY_POST_FAIL);
@@ -73,20 +73,10 @@ public class ApplyPostServiceImp implements ApplyPostService {
             }
             applyPost.setPostId(postId);
             applyPost.setPosterId(post.getPosterId());
-            
-            CvSend cvSend = mapper.map(cv, CvSend.class);
-            cvSend.setEmployeeId(account.getId());
-            cvSend.setName(account.getName());
-            cvSend.setEmail(account.getEmail());
-            cvSend.setTel(account.getTel());
-            cvSend.setGender(account.isGender());
-            cvSend.setAge(account.getAge());
-            String uuid = UUID.randomUUID().toString();
-            cvSend.setUuid(uuid);
-            cvSendService.save(cvSend);
             applyPost.setType(0);
-            applyPost.setLinkCv(uuid);
+            applyPost.setLinkCv(cv.getUuid());
             applyPost.setAccountId(account.getId());
+            applyPost.setCvId(cv.getId());
             applyPost = Utils.setCreate(applyPost);
             applyPostRepository.save(applyPost);
             res.setStatus(Constants.SUCCESS);
@@ -99,11 +89,18 @@ public class ApplyPostServiceImp implements ApplyPostService {
         return res;
     }
 
+    @Override
     public DataResponse getByPosterId(){
         log.debug("ApplyPostServiceImp.getByPosterId()");
         DataResponse res = new DataResponse();
         try{
-            List<ApplyPost> applyPosts = applyPostRepository.getByPosterId(accountService.getAccountLogin().getId());
+            List<ApplyPostManagementItfDto> applyPostsItf = applyPostRepository.getByPosterId(accountService.getAccountLogin().getId());
+            List<ApplyPostManagementDto> applyPosts = Utils.mapList(applyPostsItf, ApplyPostManagementDto.class);
+            for(ApplyPostManagementDto a : applyPosts){
+                a.setCreateTime(Utils.getStringDateTimeDisplay(Utils.getDateTime(a.getCreateTime())));
+                if(a.getAppTime() != null)
+                    a.setAppTime(Utils.getStringDateDisplay(Utils.getDate(a.getAppTime())));
+            }
             if(applyPosts.size() == 0){
                 res.setStatus(Constants.NOT_FOUND);
                 res.setMessage(Constants.DATA_EMPTY);
@@ -145,6 +142,10 @@ public class ApplyPostServiceImp implements ApplyPostService {
         try{
             List<MyApplyPostItfDto> myApplyPostItfDtos = applyPostRepository.getApplyPostByAcocuntId(accountService.getAccountLogin().getId());
             List<MyApplyPostDto> myApplyPostDtos = Utils.mapList(myApplyPostItfDtos, MyApplyPostDto.class);
+            for (MyApplyPostDto m: myApplyPostDtos) {
+                if(m.getAppTime() != null)
+                    m.setAppTime(Utils.getStringDateDisplay(Utils.getDate(m.getAppTime())));
+            }
             res.setStatus(Constants.SUCCESS);
             res.setResult(myApplyPostDtos);
             return res;
@@ -181,5 +182,34 @@ public class ApplyPostServiceImp implements ApplyPostService {
         return p;
     }
 
-
+    @Override
+    public DataResponse confirm(String id, String message, String date, String type){
+        DataResponse res = new DataResponse();
+        try{
+            Long applyId = Long.parseLong(id);
+            ApplyPost applyPost = applyPostRepository.getApplyPostById(applyId);
+            if(type.equals("1")){
+                applyPost.setType(1);
+                applyPost.setMessage(message);
+                applyPost.setUpdateBy(accountService.getAccountLogin().getName());
+                applyPostRepository.save(applyPost);
+            }
+            else if(type.equals("2")){
+                applyPost.setType(2);
+                applyPost.setMessage(message);
+                LocalDate appTime = LocalDate.parse(date);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                String outputDate = appTime.format(formatter);
+                applyPost.setAppTime(outputDate);
+                applyPost.setUpdateBy(accountService.getAccountLogin().getName());
+                applyPostRepository.save(applyPost);
+            }
+            res.setStatus(Constants.SUCCESS);
+            res.setMessage(Constants.SAVE_SUCCESS);
+        }catch (Exception e){
+            res.setStatus(Constants.ERROR);
+            res.setMessage(Constants.SAVE_FAIL);
+        }
+        return res;
+    }
 }

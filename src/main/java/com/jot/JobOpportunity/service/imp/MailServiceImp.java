@@ -1,12 +1,15 @@
 package com.jot.JobOpportunity.service.imp;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 
+import com.jot.JobOpportunity.dto.autosearch.AutoSearchRunDto;
+import com.jot.JobOpportunity.dto.post.PostAutoSearchDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
@@ -85,4 +88,15 @@ public class MailServiceImp implements MailService {
 			log.debug("Fail to send mail to: " + email);
 		}
 	}
+	@Async
+	@Override
+	public void sendMailAutoSearch(List<PostAutoSearchDto> posts, AutoSearchRunDto autoSearchRunDto){
+		log.debug("Request send mail auto search: " + autoSearchRunDto.getEmail());
+		Locale locale = Locale.forLanguageTag("vn");
+		Context context = new Context(locale);
+		context.setVariable(Constants.POSTS, posts);
+		String content = templateEngine.process("email/auto-search", context);
+		this.sendEmail(Constants.SUCCESS_AUTO_SEARCH, content, autoSearchRunDto.getEmail());
+	}
+
 }

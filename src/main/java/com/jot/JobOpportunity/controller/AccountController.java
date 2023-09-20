@@ -14,7 +14,6 @@ import com.jot.JobOpportunity.dto.account.AccountChangePass;
 import com.jot.JobOpportunity.dto.account.AccountLogin;
 import com.jot.JobOpportunity.dto.account.AccountRegister;
 import com.jot.JobOpportunity.dto.account.AccountUpdateInforDto;
-import com.jot.JobOpportunity.dto.otp.OtpCheck;
 import com.jot.JobOpportunity.entity.Account;
 import com.jot.JobOpportunity.entity.response.DataResponse;
 import com.jot.JobOpportunity.entity.response.LoginResponse;
@@ -89,9 +88,9 @@ public class AccountController {
 	}
 	
 	@PutMapping("/check-otp")
-    public DataResponse checkOtp(@RequestBody OtpCheck otpCheck) {
-        log.debug("REST request to check otp : {}", otpCheck);
-        DataResponse res = otpService.check(otpCheck);
+    public DataResponse checkOtp(@RequestParam("otp") String otp,@RequestParam("id") String id) {
+        log.debug("REST request to check otp : {}", id);
+        DataResponse res = otpService.check(otp, id);
 		return res;
     }
 
@@ -108,5 +107,19 @@ public class AccountController {
     	DataResponse res = accountService.accountUpdateInformation(updatenformations);
     	return res;
     }
+
+	@GetMapping("/management")
+	public DataResponse getAccountManagement() {
+		log.debug("REST request to get account management");
+		DataResponse res = accountService.getAccountManagement();
+		return res;
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public DataResponse deleteAccountById(@PathVariable("id") String id) {
+		log.debug("AccountController.deleteAccountById()");
+		DataResponse res = accountService.deleteAccountById(id);
+		return res;
+	}
     
 }

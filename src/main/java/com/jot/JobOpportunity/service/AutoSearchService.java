@@ -12,5 +12,5 @@ public interface AutoSearchService {
     public DataResponse createAutoSearch(AutoSearchDto autoSearchDto);
     public DataResponse getAutoSearchByCurrentUser();
     public List<AutoSearchRunDto> getAllAutoSearch();
-
+    public void autoSearch();
 }

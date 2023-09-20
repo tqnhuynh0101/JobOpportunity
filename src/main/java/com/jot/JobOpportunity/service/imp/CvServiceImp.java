@@ -2,9 +2,11 @@ package com.jot.JobOpportunity.service.imp;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import com.jot.JobOpportunity.entity.Skill;
 import org.apache.commons.io.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -22,13 +24,11 @@ import com.jot.JobOpportunity.dto.cv.CvDetailDto.Education;
 import com.jot.JobOpportunity.dto.cv.CvDetailDto.WorkExperience;
 import com.jot.JobOpportunity.dto.cv.CvDetailItfDto;
 import com.jot.JobOpportunity.entity.Cv;
-import com.jot.JobOpportunity.entity.CvSend;
 import com.jot.JobOpportunity.entity.SkillEmployee;
 import com.jot.JobOpportunity.entity.response.DataResponse;
 import com.jot.JobOpportunity.repository.CvRepository;
 import com.jot.JobOpportunity.repository.SkillEmployeeRepository;
 import com.jot.JobOpportunity.service.AccountService;
-import com.jot.JobOpportunity.service.CvSendService;
 import com.jot.JobOpportunity.service.CvService;
 import com.jot.JobOpportunity.service.SkillService;
 
@@ -53,8 +53,6 @@ public class CvServiceImp implements CvService {
     @Autowired
     private SkillService skillService;
     
-    @Autowired
-    private CvSendService cvSendService;
 
     @Override
     public DataResponse getCvByCurrentUser() {
@@ -81,8 +79,9 @@ public class CvServiceImp implements CvService {
 
     }
 
+    @Override
     @Transactional
-    private DataResponse create(String strCv, MultipartFile file) {
+    public DataResponse create(String strCv, MultipartFile file) {
         log.debug("CvServiceImp.create()");
         DataResponse res = new DataResponse();
         try {
@@ -91,7 +90,7 @@ public class CvServiceImp implements CvService {
             cvDetailDto.setEmployeeId(accountService.getAccountLogin().getId());
             List<Education> listEducation = cvDetailDto.getEducation();
             for (Education ed : listEducation) {
-                if (ed.getFrom() >= ed.getTo()) {
+                if (ed.getFrom() > ed.getTo()) {
                     res.setStatus(Constants.ERROR);
                     res.setMessage(Constants.INVALID_DATA);
                     res.setResult(ed);
@@ -104,7 +103,7 @@ public class CvServiceImp implements CvService {
 
             List<WorkExperience> listWorkExperiences = cvDetailDto.getWorkExperience();
             for (WorkExperience we : listWorkExperiences) {
-                if (we.getFrom() >= we.getTo()) {
+                if (we.getFrom() > we.getTo()) {
                     res.setStatus(Constants.ERROR);
                     res.setMessage(Constants.INVALID_DATA);
                     res.setResult(we);
@@ -130,10 +129,12 @@ public class CvServiceImp implements CvService {
             if (null != cvDetailDto.getSkill()) {
                 skillEmployeeRepository.deleteByEmployeeId(accountService.getAccountLogin().getId());
                 for (String skill : cvDetailDto.getSkill()) {
-                    skillService.saveSkill(skill);
+                    Long skillId = skillService.saveSkill(skill);
+
                     SkillEmployee skillEmployee = new SkillEmployee();
                     skillEmployee.setEmployeeId(accountService.getAccountLogin().getId());
                     skillEmployee.setSkill(skill);
+                    skillEmployee.setSkillId(skillId);
                     skillEmployee = Utils.setCreate(skillEmployee);
                     skillEmployeeRepository.save(skillEmployee);
                 }
@@ -158,6 +159,8 @@ public class CvServiceImp implements CvService {
                 cv.setAvatar(avatar);
             }
             cv = Utils.setCreate(cv);
+            String uuid = UUID.randomUUID().toString();
+            cv.setUuid(uuid);
             cvRepository.save(cv);
             // End code
 
@@ -173,7 +176,7 @@ public class CvServiceImp implements CvService {
         }
     }
     @Transactional
-    private String saveFile(MultipartFile file, String path) {
+    public String saveFile(MultipartFile file, String path) {
         log.debug("Request to save file:  {}");
         String fileUrl = path + Utils.currentTime() + file.getOriginalFilename();
         try {
@@ -184,12 +187,13 @@ public class CvServiceImp implements CvService {
         }
     }
 
+    @Override
     @Transactional
-    private DataResponse update(String strCv, MultipartFile file) {
+    public DataResponse update(String strCv, MultipartFile file) {
         log.debug("CvServiceImp.update()");
         DataResponse res = new DataResponse();
         try {
-            Cv cv = new Cv();
+            Cv cv = cvRepository.getById(accountService.getAccountLogin().getId());
             CvDetailDto cvDetailDto = Utils.convertStringToObject(strCv, CvDetailDto.class);
             cvDetailDto.setEmployeeId(accountService.getAccountLogin().getId());
             List<Education> listEducation = cvDetailDto.getEducation();
@@ -217,10 +221,11 @@ public class CvServiceImp implements CvService {
             if (null != cvDetailDto.getSkill()) {
                 skillEmployeeRepository.deleteByEmployeeId(accountService.getAccountLogin().getId());
                 for (String skill : cvDetailDto.getSkill()) {
-                    skillService.saveSkill(skill);
+                    Long skillId = skillService.saveSkill(skill);
                     SkillEmployee skillEmployee = new SkillEmployee();
                     skillEmployee.setEmployeeId(accountService.getAccountLogin().getId());
                     skillEmployee.setSkill(skill);
+                    skillEmployee.setSkillId(skillId);
                     skillEmployee = Utils.setCreate(skillEmployee);
                     skillEmployeeRepository.save(skillEmployee);
                 }
@@ -257,8 +262,9 @@ public class CvServiceImp implements CvService {
             	cvDetailDto.setAvatar(cvDb.getAvatar());
             }
             cv = Utils.setUpdate(cv);
-            cvRepository.update(cv.getIntro(), cv.getEducation(), cv.getAddress(), cv.getWorkExperience(), cv.getCertifications(), cv.getAwards(), 
-            		cv.getInterest(), cv.getAvatar(), cv.getEmployeeId());
+//            cvRepository.update(cv.getIntro(), cv.getEducation(), cv.getAddress(), cv.getWorkExperience(), cv.getCertifications(), cv.getAwards(),
+//            		cv.getInterest(), cv.getAvatar(), cv.getEmployeeId());
+            cvRepository.save(cv);
             // End code
 
             res.setStatus(Constants.SUCCESS);
@@ -315,45 +321,49 @@ public class CvServiceImp implements CvService {
         }
     }
 
+    @Override
     public DataResponse getCvByUuid(String uuid){
         log.debug("CvServiceImp.getByUuid()");
         DataResponse res = new DataResponse();
-        try{
-            CvSend cv = cvSendService.getCvByUuid(uuid);
-            if(cv == null){
-                res.setStatus(Constants.NOT_FOUND);
-                res.setMessage(Constants.DATA_EMPTY);
-                return res;
-            }
-            res.setStatus(Constants.SUCCESS);
-            res.setResult(cv);
-            return res;
-        }catch(Exception e){
-            res.setStatus(Constants.ERROR);
-            return res;
-        }
-    }
-
-	@Override
-	@Transactional
-	public DataResponse save(String cv, MultipartFile file) {
-		log.debug("CvServiceImp.save()");
-        DataResponse res = new DataResponse();
         try {
-        	Long id = accountService.getAccountLogin().getId();
-            CvDetailItfDto cvDb = cvRepository.selectCvByEmployeId(id);
-            if (cvDb == null) {
-                res = this.create(cv, file);
+            CvDetailItfDto cv = cvRepository.getByUuid(uuid);
+            if (cv == null) {
+                res.setMessage(Constants.CV_NOT_FOUND);
+                res.setStatus(Constants.NOT_FOUND);
             } else {
-            	res = this.update(cv, file);
+                CvDetailDto baseCv = this.covertCvToCvDetailDto(cv);
+                baseCv.setAvatar(Utils.convertToBase64(baseCv.getAvatar()));
+                res.setStatus(Constants.SUCCESS);
+                res.setResult(baseCv);
             }
             return res;
         } catch (Exception e) {
             res.setStatus(Constants.ERROR);
-            res.setMessage(Constants.SAVE_FAIL);
+            res.setMessage(Constants.DATA_ERROR);
             return res;
         }
-	}
+    }
+
+//	@Override
+//	@Transactional
+//	public DataResponse save(String cv, MultipartFile file) {
+//		log.debug("CvServiceImp.save()");
+//        DataResponse res = new DataResponse();
+//        try {
+//        	Long id = accountService.getAccountLogin().getId();
+//            CvDetailItfDto cvDb = cvRepository.selectCvByEmployeId(id);
+//            if (cvDb == null) {
+//                res = this.create(cv, file);
+//            } else {
+//            	res = this.update(cv, file);
+//            }
+//            return res;
+//        } catch (Exception e) {
+//            res.setStatus(Constants.ERROR);
+//            res.setMessage(Constants.SAVE_FAIL);
+//            return res;
+//        }
+//	}
 
 
 }

@@ -17,6 +17,6 @@ public interface SkillService {
 
 	public DataResponse approveSkillById(String id);
 
-	public void saveSkill(String skill);
+	public Long saveSkill(String skill);
  
 }

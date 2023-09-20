@@ -117,13 +117,6 @@ public class PostController  {
         return res;
     }
 
-    @PostMapping("/auto-search")
-    public DataResponse searchByAutoSearch(@RequestBody AutoSearchRunDto autoSearchRunDto){
-        log.debug("PostController.searchByAutoSearch()");
-        DataResponse res = postService.searchByAutoSearch(autoSearchRunDto);
-        return res;
-    }
-
     @PutMapping("/approve/{id}")
     public DataResponse approvePost(@PathVariable("id") String id){
         log.debug("PostController.approvePost()");

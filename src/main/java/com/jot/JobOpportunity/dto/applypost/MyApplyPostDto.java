@@ -1,5 +1,7 @@
 package com.jot.JobOpportunity.dto.applypost;
 
+import com.jot.JobOpportunity.common.Utils;
+
 public class MyApplyPostDto {
     private Long id;
     private Long accountId;
@@ -51,7 +53,7 @@ public class MyApplyPostDto {
     }
 
     public void setAppTime(String appTime) {
-        this.appTime = appTime;
+       this.appTime = appTime;
     }
 
     public String getLinkCv() {

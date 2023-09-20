@@ -12,4 +12,8 @@ public interface PostAutoSearchItfDto {
     BigDecimal getSalaryMin();
     BigDecimal getSalaryMax();
     String getProvinceId();
+    String getTitle();
+    String getImage();
+    String getContent();
+    String getUnit();
 }

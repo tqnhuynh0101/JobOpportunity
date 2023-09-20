@@ -17,7 +17,7 @@ public class ApprovedPost extends BaseEntity{
     @Column(name = "is_free", columnDefinition = "BIT DEFAULT 1")
     private boolean isFree;
 
-    @Column(name = "quantity", columnDefinition = "TINYINT(4) DEFAULT 0")
+    @Column(name = "quantity", columnDefinition = "BIGINT DEFAULT 0")
     private Integer quantity;
 
     @Column(name = "expired_date", columnDefinition = "VARCHAR(50)")

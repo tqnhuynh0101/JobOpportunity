@@ -11,6 +11,7 @@ import com.jot.JobOpportunity.repository.AutoSearchRepository;
 import com.jot.JobOpportunity.repository.SkillEmployeeRepository;
 import com.jot.JobOpportunity.service.AccountService;
 import com.jot.JobOpportunity.service.AutoSearchService;
+import com.jot.JobOpportunity.service.PostService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class AutoSearchServiceImp implements AutoSearchService {
     private AccountService accountService;
 
     @Autowired
-    private ModelMapper mapper;
+    private PostService postService;
 
     @Autowired
     private AutoSearchRepository autoSearchRepository;
@@ -137,5 +138,15 @@ public class AutoSearchServiceImp implements AutoSearchService {
             baseAuto.setSalary(autoSearchItfDto.getSalary());
             return baseAuto;
         }
+    }
+    @Override
+    @Transactional
+    public void autoSearch() {
+        log.debug("AutoSearchServiceImp.autoSearch()");
+        List<AutoSearchRunDto> autoSearchRunDtos = this.getAllAutoSearch();
+        for (AutoSearchRunDto a: autoSearchRunDtos) {
+            postService.searchByAutoSearch(a);
+        }
+        return;
     }
 }

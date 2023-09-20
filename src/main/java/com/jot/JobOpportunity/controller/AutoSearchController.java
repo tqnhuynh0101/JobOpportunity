@@ -30,4 +30,11 @@ public class AutoSearchController {
         DataResponse res = autoSearchService.getAutoSearchByCurrentUser();
         return res;
     }
+
+    @GetMapping("/test")
+    public void auto(){
+        log.debug("Request get by current user");
+        autoSearchService.autoSearch();
+        return;
+    }
 }

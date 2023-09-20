@@ -62,8 +62,9 @@ public class SkillPostServiceImp implements SkillPostService {
 	@Transactional
 	public void saveSkillPost(SkillPost skillPost) {
 		log.debug("SkillPostServiceImp.saveSkillPost()");
-		skillService.saveSkill(skillPost.getSkill());
+		Long skillId = skillService.saveSkill(skillPost.getSkill());
 		skillPost = Utils.setCreate(skillPost);
+		skillPost.setSkillId(skillId);
 		skillPostRepository.save(skillPost);
 	}
 

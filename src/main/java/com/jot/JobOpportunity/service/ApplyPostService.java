@@ -12,4 +12,5 @@ public interface ApplyPostService {
     public DataResponse getMyApplyPost();
     public DataResponse deleteMyApplyPost(String id);
     public ApplyPost checkApply(Long acocuntId, Long postId);
+    public DataResponse confirm(String id, String message, String date, String type);
 }

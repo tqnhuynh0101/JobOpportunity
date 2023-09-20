@@ -102,6 +102,28 @@ public class Utils {
 			return null;
 		}
 	}
+
+	public static int compareDate(String date) {
+		int nowDate = Integer.parseInt(Utils.currentDate());
+		int d = Integer.parseInt(date);
+		if(nowDate == d) {
+			return 0;
+		} else if(nowDate > d) {
+			return -1;
+		} else {
+			return 1;
+		}
+	}
+
+	public static String getStringDateTimeDisplay(Date d) {
+		SimpleDateFormat f = new SimpleDateFormat(Constants.DD_MM_YYYY_HH_mm_ss);
+		return f.format(d);
+	}
+
+	public static String getStringDateDisplay(Date d) {
+		SimpleDateFormat f = new SimpleDateFormat(Constants.DD_MM_YYYY);
+		return f.format(d);
+	}
 	
 	public static String getStringDate(Date d) {
 		SimpleDateFormat f = new SimpleDateFormat(Constants.YYYY_MM_DD);

@@ -5,8 +5,10 @@ import java.math.BigDecimal;
 public interface AutoSearchRunItfDto {
     Long getAccountId();
     Integer getAge();
-    Integer getGender();
+    boolean getGender();
     String getProvinceCode();
     BigDecimal getSalary();
     String getPos();
+    String getEmail();
+    String getContent();
 }
