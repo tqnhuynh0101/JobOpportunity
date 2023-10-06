@@ -28,7 +28,8 @@ public class JwtTokenProvider {
 	public String generateToken(CustomUserDetails userDetails) {
 		Date now = new Date();
 		Date expiryDate = new Date(now.getTime() + expiration);
-		return Jwts.builder().setSubject(Long.toString(userDetails.getAccount().getId())).setIssuedAt(now)
+		return Jwts.builder().
+				setSubject(Long.toString(userDetails.getAccount().getId())).setIssuedAt(now)
 				.setExpiration(expiryDate).signWith(SignatureAlgorithm.HS512, secret).compact();
 	}
 
