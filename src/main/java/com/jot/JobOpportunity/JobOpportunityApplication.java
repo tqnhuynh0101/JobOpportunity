@@ -6,6 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication
 @PropertySource("classpath:/config/application.yml")
+
 public class JobOpportunityApplication {
 
 	public static void main(String[] args) {
