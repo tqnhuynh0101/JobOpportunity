@@ -33,6 +33,17 @@ public class Payment extends BaseEntity{
     @Column(name ="year", columnDefinition = "VARCHAR(45)", nullable = false)
     private String year;
 
+    @Column(name = "type", columnDefinition = "BIT DEFAULT 0", nullable = false)
+    private boolean type;
+
+    public boolean isType() {
+        return type;
+    }
+
+    public void setType(boolean type) {
+        this.type = type;
+    }
+
     public String getMonth() {
         return month;
     }

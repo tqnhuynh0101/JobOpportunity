@@ -13,6 +13,6 @@ public interface PaymentService {
 
     public DataResponse payment(BigDecimal amount, String content, String type, Integer quantity, Integer quantityMonth);
     DataResponse getIncome();
-
+    public void paySuccess(String id);
     DataResponse getDealDetail(String id);
 }

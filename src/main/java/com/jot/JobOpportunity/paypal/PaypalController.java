@@ -1,5 +1,8 @@
 package com.jot.JobOpportunity.paypal;
 
+import com.jot.JobOpportunity.common.Constants;
+import com.jot.JobOpportunity.entity.response.DataResponse;
+import com.jot.JobOpportunity.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -15,31 +18,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping("api/paypal")
 public class PaypalController {
 
 	@Autowired
 	PaypalService service;
+
+	@Autowired
+	PaymentService paymentService;
 
 	public static final String SUCCESS_URL = "jot/management/checkout";
 	public static final String CANCEL_URL = "pay/cancel";
 
 	@GetMapping("/home")
 	public String home() {
-		return "home";
+		return "cancel";
 	}
 
 	//localhost:9090/pay
 	@PostMapping("/pay")
-	public ResponseEntity<String> payment(@RequestBody Order order) {
+	public DataResponse payment(@RequestBody Order order) {
+		DataResponse res = new DataResponse();
 		try {
+			System.out.println(order.getDescription());
 			Payment payment = service.createPayment(order.getPrice(), order.getCurrency(), order.getMethod(),
 					order.getIntent(), order.getDescription(), "http://localhost:9080/" + CANCEL_URL,
-					"http://localhost:81/" + SUCCESS_URL);
+					"http://localhost:81/" + SUCCESS_URL+"?id="+ order.getDescription());
 
 			for(Links link:payment.getLinks()) {
 				if(link.getRel().equals("approval_url")) {
 					System.out.println(payment.getPayer());
-					return ResponseEntity.status(HttpStatus.OK).body(link.getHref());
+					res.setStatus(Constants.SUCCESS);
+					res.setResult(link.getHref());
+					return res;
+//					return ResponseEntity.status(HttpStatus.OK).body(link.getHref());
 				}
 			}
 
@@ -47,7 +59,10 @@ public class PaypalController {
 
 			e.printStackTrace();
 		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Payment creation failed.");
+		res.setStatus(Constants.ERROR);
+		res.setMessage(Constants.PAID_ERROR);
+		return res;
+//		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Payment creation failed.");
 	}
 	
 	 @GetMapping(value = CANCEL_URL)
@@ -56,11 +71,12 @@ public class PaypalController {
 	    }
 
 	@GetMapping("pay/success")
-	public ResponseEntity<String> successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
+	public ResponseEntity<String> successPay(@RequestParam("id") String id,@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
 		try {
 			Payment payment = service.executePayment(paymentId, payerId);
 			if (payment.getState().equals("approved")) {
 				System.out.println("OrderId "+ payment.getTransactions().get(0).getDescription());
+				paymentService.paySuccess(id);
 				return ResponseEntity.ok(payment.getTransactions().get(0).getDescription());
 			}
 		} catch (PayPalRESTException e) {

@@ -3,14 +3,13 @@ package com.jot.JobOpportunity.paypal;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.paypal.base.rest.APIContext;
+import com.paypal.base.rest.OAuthTokenCredential;
+import com.paypal.base.rest.PayPalRESTException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.paypal.api.payments.PaymentHistory;
-import com.paypal.base.rest.APIContext;
-import com.paypal.base.rest.OAuthTokenCredential;
-import com.paypal.base.rest.PayPalRESTException;
 
 @Configuration
 public class PaypalConfig {
@@ -33,6 +32,7 @@ public class PaypalConfig {
 	public OAuthTokenCredential oAuthTokenCredential() {
 		return new OAuthTokenCredential(clientId, clientSecret, paypalSdkConfig());
 	}
+
 
 	@Bean
 	public APIContext apiContext() throws PayPalRESTException {

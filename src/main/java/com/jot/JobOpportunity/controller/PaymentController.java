@@ -29,6 +29,11 @@ public class PaymentController {
         return res;
     }
 
+//    @PostMapping("pay-success")
+//    public void paySuccess(@PathVariable String id){
+//        paymentService.paySuccess(id);
+//    }
+
     @GetMapping("/income")
     public DataResponse getIncome(){
         DataResponse res = paymentService.getIncome();

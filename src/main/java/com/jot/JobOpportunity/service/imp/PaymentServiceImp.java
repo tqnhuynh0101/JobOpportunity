@@ -56,6 +56,7 @@ public class PaymentServiceImp implements PaymentService {
             Payment p = new Payment();
             p.setAmount(amount);
             p.setContent(content);
+            p.setType(false);
             p.setEmployeeId(accountService.getAccountLogin().getId());
             p.setCreateBy(accountService.getAccountLogin().getName());
             p.setCreateTime(Utils.currentDateTime());
@@ -99,6 +100,7 @@ public class PaymentServiceImp implements PaymentService {
             }
             res.setStatus(Constants.SUCCESS);
             res.setMessage(Constants.PAID_SUCCESS);
+            res.setResult(p);
             return res;
         }catch (Exception e){
             res.setStatus(Constants.ERROR);
@@ -130,6 +132,24 @@ public class PaymentServiceImp implements PaymentService {
             res.setStatus(Constants.ERROR);
             res.setMessage(Constants.DATA_EMPTY);
             return res;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void paySuccess(String id) {
+        log.debug("PaymentServiceImp.paySuccess()");
+        DataResponse res = new DataResponse();
+        try {
+            Long paymentId = Long.parseLong(id);
+            Payment p = paymentRepository.getById(paymentId);
+            p.setType(true);
+            p.setCreateTime(Utils.getStringDateTimeDisplay(Utils.getDateTime(p.getCreateTime())));
+            p.setCreateBy(accountService.getAccountLogin().getName());
+            paymentRepository.save(p);
+        }
+        catch (Exception e){
+
         }
     }
 
