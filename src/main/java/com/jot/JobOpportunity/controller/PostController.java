@@ -1,5 +1,6 @@
 package com.jot.JobOpportunity.controller;
 
+import com.jot.JobOpportunity.common.Constants;
 import com.jot.JobOpportunity.dto.autosearch.AutoSearchRunDto;
 import com.jot.JobOpportunity.dto.post.PostAutoSearchDto;
 import com.jot.JobOpportunity.dto.post.PostCreateDto;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,14 +79,29 @@ public class PostController  {
        DataResponse res = postService.searchPost(wardId, districtId, provinceId, search);
         return res;
     }
+    private boolean isJpg(MultipartFile file) {
+        return file.getContentType() != null && file.getContentType().equals(MediaType.IMAGE_JPEG_VALUE);
+    }
+
+    private boolean isPng(MultipartFile file) {
+        return file.getContentType() != null && file.getContentType().equals(MediaType.IMAGE_PNG_VALUE);
+    }
 
     @PostMapping("/create")
     public DataResponse createPost(MultipartHttpServletRequest data) {
         log.debug("PostController.createPost");
         MultipartFile file = data.getFile("file");
         String str = data.getParameter("post");
-        DataResponse res = postService.create(str, file);
-        return res;
+        if (file != null && (isJpg(file) || isPng(file))) {
+            DataResponse res = postService.create(str, file);
+            return res;
+        } else {
+            // Return an error response if the file is not JPEG or PNG
+            DataResponse errorResponse = new DataResponse();
+            errorResponse.setStatus(Constants.ERROR);
+            errorResponse.setMessage("File không đúng định dạng");
+            return errorResponse;
+        }
     }
 
     @PutMapping("/update")
