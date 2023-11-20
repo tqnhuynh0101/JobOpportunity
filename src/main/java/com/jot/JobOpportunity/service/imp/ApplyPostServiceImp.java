@@ -155,6 +155,11 @@ public class ApplyPostServiceImp implements ApplyPostService {
         }
     }
 
+//    @Override
+//    public DataResponse autoApproveCv() {
+//
+//    }
+
     @Override
     @Transactional
     public DataResponse deleteMyApplyPost(String id) {

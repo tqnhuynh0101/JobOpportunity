@@ -18,7 +18,8 @@ public class Effect implements Serializable {
     @Column(name = "post_id", columnDefinition = "BIGINT", nullable = false)
     private Long postId;
 
-
+    @Column(name = "cv_id", columnDefinition = "BIGINT", nullable = false)
+    private Long cvId;
 
     public Effect() {
     }
@@ -45,5 +46,13 @@ public class Effect implements Serializable {
 
     public void setPostId(Long postId) {
         this.postId = postId;
+    }
+
+    public Long getCvId() {
+        return cvId;
+    }
+
+    public void setCvId(Long cvId) {
+        this.cvId = cvId;
     }
 }

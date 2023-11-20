@@ -1,5 +1,6 @@
 package com.jot.JobOpportunity.common;
-
+import java.util.HashSet;
+import java.util.Set;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -195,5 +196,19 @@ public class Utils {
 		fileInputStream.read(fileByte);
 		fileInputStream.close();
 		return Base64.getEncoder().encodeToString(fileByte);
+	}
+
+	public static double calculateJaccardSimilarity(String text1, String text2) {
+		Set<String> set1 = new HashSet<>(Set.of(text1.split("\\s+")));
+		Set<String> set2 = new HashSet<>(Set.of(text2.split("\\s+")));
+
+		// Tính intersection và union
+		Set<String> intersection = new HashSet<>(set1);
+		intersection.retainAll(set2);
+		Set<String> union = new HashSet<>(set1);
+		union.addAll(set2);
+
+		// Tính chỉ số Jaccard
+		return (double) intersection.size() / union.size();
 	}
 }

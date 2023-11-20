@@ -103,4 +103,15 @@ public class Constants {
 	public static final String PAID_SUCCESS = "Thanh toán thành công";
 
 	public static final String PAID_ERROR = "Thanh toán thất bại";
+
+	public static final String CREATECV_ERROR_EMAIL = "Không để trống, đúng định dạng";
+
+	public static final String CREATECV_ERROR_SDT = "Không để trống, nhập kiểu số, đúng định dạng";
+
+	public static final String CREATECV_ERROR_E002 = "Không để trống, có thể nhập hoặc chọn kĩ năng";
+
+	public static final String CREATECV_ERROR_E001 = "Không để trống";
+
+	public static final String CREATEPOST_ERROR_E003 = "Không để trống, nhập từ 18 đến 60 , lớn hơn tuổi nhỏ nhất";
+
 }

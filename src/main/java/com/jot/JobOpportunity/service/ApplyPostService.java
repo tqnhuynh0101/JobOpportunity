@@ -10,6 +10,7 @@ public interface ApplyPostService {
     public DataResponse getByPosterId();
     public DataResponse getByAccountId();
     public DataResponse getMyApplyPost();
+//    public DataResponse autoApproveCv();
     public DataResponse deleteMyApplyPost(String id);
     public ApplyPost checkApply(Long acocuntId, Long postId);
     public DataResponse confirm(String id, String message, String date, String type);

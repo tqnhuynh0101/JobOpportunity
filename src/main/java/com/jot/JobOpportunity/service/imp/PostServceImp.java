@@ -579,7 +579,7 @@ public class PostServceImp implements PostService {
             }
             autoSearchRunDto.setSkills(skillEmployeeRepository.getByEmployeeId(autoSearchRunDto.getAccountId()));
             for (PostAutoSearchDto p : post){
-                int count = 0;
+                double count = 0;
                 if(p.getGender().equals(2) || p.getGender().equals(autoSearchRunDto.getGender()))
                     count += 1;
                 if(p.getSalaryMax().compareTo(autoSearchRunDto.getSalary()) >=0 && p.getSalaryMin().compareTo(autoSearchRunDto.getSalary()) <= 0)
@@ -587,7 +587,7 @@ public class PostServceImp implements PostService {
                 if(p.getAgeMax() >= autoSearchRunDto.getAge() && p.getAgeMin() <= autoSearchRunDto.getAge())
                     count += 1;
                 if(p.getPosition().equals(autoSearchRunDto.getPos()))
-                    count += 1;
+//                    count = count + Utils.calculateJaccardSimilarity(p.getPosition(),autoSearchRunDto.getPos());
                 if(p.getProvinceId().equals(autoSearchRunDto.getProvinceCode()))
                     count += 1;
                 Set tempset = new HashSet();
